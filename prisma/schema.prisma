@@ -1,0 +1,75 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                String   @id @default(cuid())
+  email             String   @unique
+  password          String?  // Password is optional for users registering via Google
+  firstName         String?
+  lastName          String?
+  role              String?  // Role can be "COACH" or "ATHLETE"
+  age               Int?
+  gender            String?
+  fitnessGoal       String?  // Fitness goal for athletes
+  imageUrl          String?  // Profile image
+  location          String?  // Location for both athletes and coaches
+  description       String?  // Description for athletes (optional)
+  createdAt         DateTime @default(now()) @map(name: "created_at")
+  updatedAt         DateTime @updatedAt @map(name: "updated_at")
+  verificationToken String?  // Add this line
+  verified          Boolean  @default(false) // Email verification status
+
+  // Relations
+  coachProfile      Coach?   // Relation to the Coach model, if the user is a coach
+  trainingSessions  Slot[]   @relation("UserBookedSessions") // Slots booked by the athlete
+
+  @@map(name: "users")
+}
+
+
+model Coach {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  sport              String
+  availability       Int      @default(0) // Number of available slots
+  rating             Float?
+  location           String
+  description        String?  // Description of the coach's expertise
+  imageUrl           String?
+  
+  // Relations
+  user               User     @relation(fields: [userId], references: [id])
+  slots              Slot[]   // Slots the coach provides
+  calendar           SlotCalendar[] // Calendar slots provided by the coach
+
+  @@map(name: "coaches")
+}
+
+model Slot {
+  id       String   @id @default(cuid())
+  dateTime DateTime // Date and time of the slot
+  duration Int      // Duration in minutes
+  status   String   @default("FREE") // Status of the slot: FREE, RESERVED
+  coachId  String
+  coach    Coach    @relation(fields: [coachId], references: [id]) // Coach providing the slot
+  userId   String?  // The user who reserved the slot (if reserved)
+  user     User?    @relation("UserBookedSessions", fields: [userId], references: [id]) // Relation for the user who booked the slot
+
+  @@map(name: "slots")
+}
+
+model SlotCalendar {
+  id       String   @id @default(cuid())
+  dateTime DateTime // Date and time of the slot
+  duration Int      // Duration in minutes
+  coachId  String
+  coach    Coach    @relation(fields: [coachId], references: [id])
+
+  @@map(name: "slotCalendars")
+}
