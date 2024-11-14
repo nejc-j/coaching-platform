@@ -4,8 +4,8 @@ import CoachCard from './CoachCard';
 interface CoachListProps {
   coaches: {
     id: string;
-    firstName: string;
-    lastName: string;
+    firstName: string | null; // Allow null values
+    lastName: string | null; // Allow null values
     coachProfile: {
       id: string;
       sport: string;

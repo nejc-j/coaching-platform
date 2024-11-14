@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prisma.user.findFirst({
       where: { verificationToken: token },
     });
 
@@ -32,7 +32,7 @@ export async function GET(request: Request) {
       },
     });
 
-    // Correct the redirect URL if necessary
+    // Redirect to the sign-in page
     return NextResponse.redirect('http://localhost:3000/api/auth/signin');
   } catch (error) {
     console.error('Error in verification route:', error);

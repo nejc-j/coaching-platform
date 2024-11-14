@@ -15,10 +15,20 @@ export default async function handler(
     const coaches = await prisma.coach.findMany({
       where: {
         OR: [
-          { name: { contains: search } }, // Removed mode property
-          { sport: { contains: search } }, // Removed mode property
-          { location: { contains: search } }, // Removed mode property
+          { sport: { contains: search } },
+          { location: { contains: search } },
+          {
+            user: {
+              OR: [
+                { firstName: { contains: search } },
+                { lastName: { contains: search } },
+              ],
+            },
+          },
         ],
+      },
+      include: {
+        user: true, // Include related user information
       },
     });
 

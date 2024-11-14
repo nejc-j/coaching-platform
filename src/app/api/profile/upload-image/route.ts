@@ -4,13 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs';
 import path from 'path';
 
-// Disable the default body parser
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
   const file = formData.get('file') as File;
@@ -19,18 +12,20 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: 'No file uploaded' }, { status: 400 });
   }
 
-  // Create a unique filename using UUID
+  // Generate a unique filename
   const filename = `${uuidv4()}-${file.name}`;
   const filePath = path.join(process.cwd(), 'public/uploads', filename);
+
+  // Create the directory if it doesn’t exist
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
 
   // Write the file to the filesystem
   const buffer = Buffer.from(await file.arrayBuffer());
   fs.writeFileSync(filePath, buffer);
 
   // Update the user's image URL in the database
-  // Replace `user@example.com` with the actual session user email
   await prisma.user.update({
-    where: { email: 'user@example.com' }, // Replace this with the authenticated user's email
+    where: { email: 'user@example.com' }, // Replace with the authenticated user's email
     data: {
       imageUrl: `/uploads/${filename}`,
     },

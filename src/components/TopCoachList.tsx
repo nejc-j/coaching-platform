@@ -4,10 +4,10 @@ import TopCoachCard from './TopCoachCard';
 interface TopCoachListProps {
   coaches: {
     id: string;
-    firstName: string;
-    lastName: string;
+    firstName: string | null; // Allow null values
+    lastName: string | null; // Allow null values
     coachProfile: {
-      id: string; // Ensure this ID is used for linking
+      id: string;
       sport: string;
       description: string | null;
       location: string;
