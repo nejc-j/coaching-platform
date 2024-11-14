@@ -56,6 +56,7 @@ export const authOptions: NextAuthConfig = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
+  trustHost: true,
   basePath: BASE_PATH,
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
